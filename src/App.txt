@@ -1,0 +1,138 @@
+import { useState, useEffect } from "react";
+import Web3 from "web3";
+import ISTE from "./ISTE.json";
+import detectEthereumProvider from "@metamask/detect-provider";
+
+function App() {
+  const [web3, setWeb3] = useState(null);
+  const [accounts, setAccounts] = useState([]);
+  const [iste, setISTE] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [transferHistory, setTransferHistory] = useState([]);
+
+  // 0x66DaA021242930549eA83d6AF5c3De554033E2E6 contract address
+  // 0x67be58c14925e6f281c2687dbb1a1e8399c67a1f32101bd2dc1140ec4db22d1e transaction hash
+
+  useEffect(() => {
+    const loadWeb3 = async () => {
+      const provider = await detectEthereumProvider();
+      if (provider) {
+        const web3 = new Web3(provider);
+        setWeb3(web3);
+        try {
+          const accounts = await web3.eth.requestAccounts();
+          setAccounts(accounts);
+          const networkId = await web3.eth.net.getId();
+          const deployedNetwork = ISTE.networks[networkId];
+          const iste = new web3.eth.Contract(
+            ISTE.abi,
+            deployedNetwork && deployedNetwork.address
+          );
+          setISTE(iste);
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        alert("Please install MetaMask to use this website");
+      }
+    };
+    loadWeb3();
+  }, []);
+
+  useEffect(() => {
+    const loadBalance = async () => {
+      if (web3 && accounts.length > 0 && iste) {
+        const balance = await iste.methods.balanceOf(accounts[0]).call();
+        setBalance(balance);
+      }
+    };
+    loadBalance();
+  }, [web3, accounts, iste]);
+
+  const handleTransfer = async (e) => {
+    e.preventDefault();
+    if (web3 && iste) {
+      try {
+        const tx = await iste.methods
+          .transfer(recipient, amount)
+          .send({ from: accounts[0] });
+        const { from, to, value, timestamp } = tx.events.Transfer.returnValues;
+        const transfer = { from, to, amount: value, timestamp };
+        setTransferHistory([transfer, ...transferHistory]);
+        setAmount(0);
+        setRecipient("");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto py-8">
+        <h1 className="text-2xl font-bold mb-4">ISTE Wallet</h1>
+        <p className="text-lg mb-2">
+          Your ISTE balance: {balance}
+        </p>
+        {accounts.length > 0 && (
+          <h2 className="text-lg font-bold mb-2">
+            Connected wallet address: {accounts.slice(0, 6)}...{accounts.slice(-4)}
+          </h2>
+        )}
+        <form onSubmit={handleTransfer} className="mb-4">
+          <label htmlFor="recipient" className="block mb-2">
+            Recipient:
+          </label>
+          <input
+            type="text"
+            id="recipient"
+            value={recipient}
+            onChange={(e) => setRecipient(e.target.value)}
+            className="border border-gray-400 p-2 mb-2 w-4/5"
+          /><br />
+          <label htmlFor="amount" className="block mb-2">
+            Amount:
+          </label>
+          <input
+          type="number"
+          id="amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="border border-gray-400 p-2 text-black mb-2 w-4/5"
+        /><br />
+        <button
+          type="submit"
+          className="bg-green-500 text-white px-4 py-2 rounded shadow-sm hover:bg-green-600"
+        >
+          Transfer
+        </button>
+      </form>
+      <h2 className="text-lg font-bold mb-2">Transfer History</h2>
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th className="px-4 py-2">From</th>
+            <th className="px-4 py-2">To</th>
+            <th className="px-4 py-2">Amount</th>
+            <th className="px-4 py-2">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transferHistory.map((transfer, index) => (
+            <tr key={index}>
+              <td className="border px-4 py-2">{transfer.from}</td>
+              <td className="border px-4 py-2">{transfer.to}</td>
+              <td className="border px-4 py-2">{transfer.amount}</td>
+              <td className="border px-4 py-2">{transfer.timestamp}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+          }
+
+          export default App;

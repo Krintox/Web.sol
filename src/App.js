@@ -78,47 +78,65 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
-      <h1 className="text-4xl font-bold text-gray-800 pb-8">Send ISTE Tokens</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col items-start">
-        <label className="text-2xl" htmlFor="recipient">
-          <span className="text-3xl px-4">
-            💸
-          </span>
-          Recipient Address:
+      <div className="bg-[#19A7CE]  text-white">
+      <div className="flex pl-11 pt-5 text-center  ">
+      <h1 className="text-4xl">🚀 Web.Sol</h1>
+      </div>
+      <div className="flex justify-center items-center p-7">
+      <h2 className="mb-2 text-6xl pt-3 pd-3 " >
+        Send ISTE Tokens
+        </h2>
+      </div>
+      </div>
+      <div className="flex justify-center items-center">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center">
+      <div className="flex justify-center ">
+        <label className="m-7 text-3xl pt-4" htmlFor="recipient">
+          🏠 Recipient Address:
         </label>
+        </div>
+        <div className=" text-2xl  ">
         <input
-          className="border-blue-400 rounded-md p-2 w-full mb-4 bg-transparent border-b-2 outline-none"
+          className=" border-b border-black text-black text-xl p-4 focus:outline-0 placeholder:text-black "
+          placeholder="Enter Address"
           type="text"
           id="recipient"
           value={recipientAddress}
           onChange={(e) => setRecipientAddress(e.target.value)}
           required
         />
-        <label className="" htmlFor="amount">
-          Amount of Tokens:
+        </div>
+        <div className="flex justify-center">
+        <label className="m-7 text-3xl pt-4" htmlFor="amount">
+          💲 Amount of Tokens:
         </label>
+        </div>
+        <div className=" text-2xl  ">
         <input
-          className="border-b-2 border-blue-400 rounded-md p-2 w-80 mb-4 bg-transparent"
+          className="border-b border-black text-black text-xl p-4 focus:outline-0 placeholder:text-black "
+          placeholder="Enter tokens"
           type="number"
           id="amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           required
         />
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
-          Send Tokens
+        </div>
+        <div className=" mt-5 pt-7 ">
+        <button className="rounded-full text-lg pt-3 pb-3 pl-6 pr-6 border-2 text-black border-[#19A7CE]  hover:bg-[#19A7CE] hover:text-white mb-5">
+          Send Tokens 🛫
         </button>
+        </div>
       </form>
+      </div>
       {transferHistory.length > 0 && (
-        <div className="w-full">
-          <h2 className="text-2xl font-bold text-gray-800">Transfer History</h2>
+        <div className="flex justify-center items-center mb-5">
           <table className="table-auto border-collapse border border-gray-400">
             <thead>
               <tr>
                 <th className="border border-gray-400 px-4 py-2">From</th>
                 <th className="border border-gray-400 px-4 py-2">To</th>
                 <th className="border border-gray-400 px-4 py-2">Amount</th>
-                <th className="border border-gray-400 px-4 py-2">Transaction Hash</th>
               </tr>
             </thead>
             <tbody>
@@ -127,7 +145,6 @@ function App() {
                   <td className="border border-gray-400 px-4 py-2">{transfer.from}</td>
                   <td className="border border-gray-400 px-4 py-2">{transfer.to}</td>
                   <td className="border border-gray-400 px-4 py-2">{transfer.amount}</td>
-                  <td className="border border-gray-400 px-4 py-2">{transfer.hash}</td>
                 </tr>
               ))}
             </tbody>
